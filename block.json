@@ -1,0 +1,7 @@
+{
+  "version": "1.0",
+  "frontendEntry": "./frontend/index.tsx",
+  "bundler": {
+    "module": "./bundler.js"
+  }
+}
