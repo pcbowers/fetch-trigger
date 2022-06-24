@@ -14,7 +14,7 @@ import {
   useBase,
   useGlobalConfig
 } from "@airtable/blocks/ui"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import {
   allColors,
   defaults,
@@ -83,14 +83,6 @@ export const SettingsComponent = () => {
   const config = useGlobalConfig()
   const base = useBase()
   const collaborators = base.activeCollaborators
-
-  // A bug (that to my knowledge resides with AT's extension implementation) causes everything to scroll to the bottom on render.
-  // This fixes it, though isn't perfect. It causes a slight flash of content.
-  useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo(0, 0)
-    }, 0)
-  }, [])
 
   const [search, setSearch] = useState("")
   const [permissionEditor, setPermissionEditor] = useState(

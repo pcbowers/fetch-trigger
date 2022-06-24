@@ -415,7 +415,7 @@ export const defaults: Settings = {
   buttonBlock: false,
   buttonCenter: true,
   buttonColor: colors.BLUE_BRIGHT,
-  buttonIcon: "bolt",
+  buttonIcon: "automations",
   webhookProxy: "",
   webhookLink: "",
   webhookData: "{}",

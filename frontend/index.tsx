@@ -37,6 +37,14 @@ const Root = () => {
     }
   })
 
+  // A bug (that to my knowledge resides with AT's extension implementation) causes everything to scroll to the bottom on render.
+  // This fixes it, though isn't perfect. It causes a slight flash of content.
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 0)
+  }, [])
+
   useWatchable(settingsButton, "click", () => {
     if (settingsButton.isVisible) setIsShowingSettings((value) => !value)
   })
