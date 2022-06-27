@@ -102,6 +102,7 @@ export const SettingsComponent = () => {
       left={0}
       right={0}
       overflowY="auto"
+      overflowX="hidden"
     >
       <Box
         display="flex"
@@ -110,8 +111,8 @@ export const SettingsComponent = () => {
         style={{ gap: "0.5rem" }}
         marginBottom="1rem"
       >
-        <Logo style={{ height: "3rem" }} />
-        <Heading size="xxlarge" marginBottom="0">
+        <Logo style={{ height: "3rem", flexShrink: 0 }} />
+        <Heading size="xlarge" marginBottom="0">
           Webhook Trigger Settings
         </Heading>
       </Box>
