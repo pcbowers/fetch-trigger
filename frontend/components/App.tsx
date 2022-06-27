@@ -180,7 +180,7 @@ export const AppComponent = () => {
                 size="small"
                 textColor={color(colors.GRAY_BRIGHT)}
                 textAlign="center"
-                marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+                marginY={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
               >
                 {message.split("\n").map((line, index, { length }) => (
                   <>
