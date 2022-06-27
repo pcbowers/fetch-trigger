@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   ColorPaletteSynced,
+  Dialog,
   FormField,
   Heading,
   Input,
@@ -47,6 +48,7 @@ export const SettingsComponent = () => {
   const collaborators = base.activeCollaborators
   const disabled = !canEdit(config, base)
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [search, setSearch] = useState("")
 
   const [permissionEditor, setPermissionEditor] = useState(
@@ -54,13 +56,15 @@ export const SettingsComponent = () => {
   )
   const { selectedUsers } = getSettings(config, base)
 
-  const handleClick = () =>
+  const handleClick = () => {
+    setIsDialogOpen(false)
     runIfCanEdit(config, base, () => {
       let key: keyof SettingsProps
       for (key in defaults) {
         config.setAsync(key, defaults[key] as any)
       }
     })
+  }
 
   const setActiveUsers = (collaborator: CollaboratorData) =>
     runIfCanEdit(config, base, () => {
@@ -124,12 +128,31 @@ export const SettingsComponent = () => {
       </Text>
       <Button
         icon="redo"
-        onClick={handleClick}
+        onClick={() => setIsDialogOpen(true)}
         disabled={disabled}
         marginBottom="1.5rem"
       >
         Reset Defaults
       </Button>
+
+      {isDialogOpen && (
+        <Dialog onClose={() => setIsDialogOpen(false)} width="320px">
+          <Dialog.CloseButton />
+          <Heading>Reset Defaults</Heading>
+          <Text variant="paragraph">
+            Are you sure you want to reset the extension&apos;s settings? This
+            will erase any changes you have made to this extension.
+          </Text>
+          <Box display="flex" style={{ gap: "0.5rem" }}>
+            <Button onClick={() => setIsDialogOpen(false)} variant="default">
+              Close
+            </Button>
+            <Button onClick={handleClick} variant="danger">
+              Reset All Settings
+            </Button>
+          </Box>
+        </Dialog>
+      )}
 
       <Accordion
         open={true}

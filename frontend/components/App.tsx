@@ -52,13 +52,14 @@ export const AppComponent = () => {
     selectedUsers
   } = getSettings(config, base, true)
 
-  const enabled = canTrigger(
-    permissionTrigger,
-    session,
-    base,
-    collaborators,
-    selectedUsers
-  )
+  const enabled =
+    canTrigger(
+      permissionTrigger,
+      session,
+      base,
+      collaborators,
+      selectedUsers
+    ) && webhookLink
 
   let [message, setMessage] = useState("")
 
