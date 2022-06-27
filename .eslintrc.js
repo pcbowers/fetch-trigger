@@ -23,7 +23,8 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": "error",
     "react/prop-types": 0,
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "react/display-name": "off"
   },
   settings: {
     react: {

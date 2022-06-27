@@ -137,8 +137,29 @@ export const AppComponent = () => {
               size={descriptionSize}
               textAlign={descriptionCenter ? "center" : "left"}
               textColor={color(colors.GRAY_BRIGHT)}
+              style={{ whiteSpace: "pre-line" }}
             >
-              {description}
+              {description
+                .replace(/\\n/g, "\n")
+                .split(
+                  /([_*])(?<!(?:\1|\w).)(?![_*\s])(.*?[^_*\s])(?=\1)([_*])(?!\w|\3)()/g
+                )
+                .reduce((prev, cur, index, arr) => {
+                  if (
+                    index !== 0 &&
+                    ["*", "_"].includes(arr[index - 1]) &&
+                    cur
+                  ) {
+                    prev.push(() => <strong>{cur}</strong>)
+                  } else if (cur && !["*", "_"].includes(cur)) {
+                    prev.push(() => <>{cur}</>)
+                  }
+
+                  return prev
+                }, [] as (() => JSX.Element)[])
+                .map((Item, index) => (
+                  <Item key={index} />
+                ))}
             </Text>
           </Box>
         )}
@@ -181,13 +202,9 @@ export const AppComponent = () => {
                 textColor={color(colors.GRAY_BRIGHT)}
                 textAlign="center"
                 marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+                style={{ whiteSpace: "pre-line" }}
               >
-                {message.split("\n").map((line, index, { length }) => (
-                  <>
-                    {line}
-                    {index < length - 1 && <br />}
-                  </>
-                ))}
+                {message}
               </Text>
             </Box>
           )}
