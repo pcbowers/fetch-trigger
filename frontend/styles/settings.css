@@ -1,7 +1,4 @@
-.collaborator:hover {
+.collaborator:hover,
+.accordion:hover {
   background-color: rgba(0, 0, 0, 0.05);
-}
-
-[data-collapsed="true"] {
-  height: 0;
 }

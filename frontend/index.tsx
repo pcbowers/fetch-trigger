@@ -13,7 +13,7 @@ import App from "@components/App"
 import Settings from "@components/Settings"
 
 const Root = () => {
-  const [isShowingSettings, setIsShowingSettings] = useState(() => false)
+  const [isShowingSettings, setIsShowingSettings] = useState(() => true)
   const base = useBase()
   const config = useGlobalConfig()
 

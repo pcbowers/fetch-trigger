@@ -4,13 +4,13 @@ import {
   ColorPaletteSynced,
   FormField,
   Heading,
-  Icon,
   Input,
   InputSynced,
   Link,
   SelectSynced,
   Switch,
   SwitchSynced,
+  Text,
   useBase,
   useGlobalConfig
 } from "@airtable/blocks/ui"
@@ -31,13 +31,15 @@ import {
   textSizes
 } from "@utils"
 
-import CollaboratorComponent from "@components/Collaborator"
+import Collaborator from "@components/Collaborator"
+import Logo from "@components/Logo"
 
 import type { CollaboratorData } from "@airtable/blocks/dist/types/src/types/collaborator"
 
 import type { Settings as SettingsProps } from "@utils"
 
 import "@styles/settings.css"
+import Accordion from "./Accordion"
 
 export const SettingsComponent = () => {
   const config = useGlobalConfig()
@@ -46,13 +48,6 @@ export const SettingsComponent = () => {
   const disabled = !canEdit(config, base)
 
   const [search, setSearch] = useState("")
-
-  const [collapseWebhook, setCollapseWebhook] = useState(false)
-  const [collapsePermission, setCollapsePermission] = useState(true)
-  const [collapseContainer, setCollapseContainer] = useState(true)
-  const [collapseTitle, setCollapseTitle] = useState(true)
-  const [collapseDescription, setCollapseDescription] = useState(true)
-  const [collapseButton, setCollapseButton] = useState(true)
 
   const [permissionEditor, setPermissionEditor] = useState(
     () => getSettings(config, base).permissionEditor
@@ -108,35 +103,39 @@ export const SettingsComponent = () => {
       right={0}
       overflowY="auto"
     >
-      <Heading size="xxlarge" marginBottom="0.5rem">
-        Webhook Trigger Settings
-      </Heading>
+      <Box
+        display="flex"
+        justifyContent="start"
+        alignItems="center"
+        style={{ gap: "0.5rem" }}
+        marginBottom="1rem"
+      >
+        <Logo style={{ height: "3rem" }} />
+        <Heading size="xxlarge" marginBottom="0">
+          Webhook Trigger Settings
+        </Heading>
+      </Box>
+      <Text marginBottom="1rem" textColor="light">
+        Change the <strong>Webhook Options</strong> to apply functionality to
+        the trigger button. Change setting and trigger permissions using the{" "}
+        <strong>Permission Options</strong>. All other options change the layout
+        and look of the extension.
+      </Text>
       <Button
         icon="redo"
         onClick={handleClick}
         disabled={disabled}
-        marginBottom="0.75rem"
+        marginBottom="1.5rem"
       >
         Reset Defaults
       </Button>
 
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapseWebhook((value) => !value)}
+      <Accordion
+        open={true}
+        title="Webhook Options"
+        description="Change these settings to set the webhook request that is triggered by
+        this extension when run."
       >
-        <Icon name={collapseWebhook ? "expand" : "collapse"} />
-        <Heading size="small">Webhook Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapseWebhook}>
         <FormField
           label="Webhook Link"
           description="The airtable webhook (or any other webhook) to pass to the webhook proxy. This will be appended to the proxy link."
@@ -201,25 +200,12 @@ export const SettingsComponent = () => {
             disabled={disabled}
           />
         </FormField>
-      </div>
+      </Accordion>
 
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapsePermission((value) => !value)}
+      <Accordion
+        title="Permission Options"
+        description="Change these settings to make changes to the setting and trigger permissions."
       >
-        <Icon name={collapsePermission ? "expand" : "collapse"} />
-        <Heading size="small">Permission Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapsePermission}>
         <FormField
           label="Editor Permissions"
           description="Allow editors to make changes to this extension's settings. Only creators are able to disable this setting."
@@ -270,7 +256,7 @@ export const SettingsComponent = () => {
                       !search
                   )
                   .map((collaborator) => (
-                    <CollaboratorComponent
+                    <Collaborator
                       key={collaborator.id}
                       collaborator={collaborator}
                       active={selectedUsers.some(
@@ -302,179 +288,12 @@ export const SettingsComponent = () => {
             </Box>
           </FormField>
         )}
-      </div>
+      </Accordion>
 
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapseContainer((value) => !value)}
+      <Accordion
+        title="Button Options"
+        description="Change these settings to alter the trigger button's text and styles."
       >
-        <Icon name={collapseContainer ? "expand" : "collapse"} />
-        <Heading size="small">Container Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapseContainer}>
-        <FormField
-          label="Large Width"
-          description="The width of the container with a large viewport."
-        >
-          <InputSynced
-            globalConfigKey="containerWidthLarge"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.containerWidthLarge}
-          />
-        </FormField>
-        <FormField
-          label="Medium Width"
-          description="The width of the container with a medium viewport."
-        >
-          <InputSynced
-            globalConfigKey="containerWidthMedium"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.containerWidthMedium}
-          />
-        </FormField>
-        <FormField
-          label="Small Width"
-          description="The width of the container with a small viewport."
-        >
-          <InputSynced
-            globalConfigKey="containerWidthSmall"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.containerWidthSmall}
-          />
-        </FormField>
-        <FormField
-          label="XSmall Width"
-          description="The width of the container with an xsmall viewport."
-        >
-          <InputSynced
-            globalConfigKey="containerWidthXSmall"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.containerWidthXSmall}
-          />
-        </FormField>
-      </div>
-
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapseTitle((value) => !value)}
-      >
-        <Icon name={collapseTitle ? "expand" : "collapse"} />
-        <Heading size="small">Title Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapseTitle}>
-        <FormField
-          label="Title"
-          description="The title displayed above the button."
-        >
-          <InputSynced
-            globalConfigKey="title"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.title}
-          />
-        </FormField>
-        <FormField label="Title Centered">
-          <SwitchSynced
-            globalConfigKey="titleCenter"
-            disabled={disabled}
-            label="Whether or not the title is centered."
-          />
-        </FormField>
-        <FormField label="Title Size" description="The size of the title.">
-          <SelectSynced
-            options={headingSizes as any}
-            globalConfigKey="titleSize"
-            disabled={disabled}
-          />
-        </FormField>
-      </div>
-
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapseDescription((value) => !value)}
-      >
-        <Icon name={collapseDescription ? "expand" : "collapse"} />
-        <Heading size="small">Description Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapseDescription}>
-        <FormField
-          label="Description"
-          description="The description displayed above the button."
-        >
-          <InputSynced
-            globalConfigKey="description"
-            type="text"
-            disabled={disabled}
-            placeholder={defaults.description}
-          />
-        </FormField>
-        <FormField label="Description Centered">
-          <SwitchSynced
-            globalConfigKey="descriptionCenter"
-            disabled={disabled}
-            label="Whether or not the description is centered."
-          />
-        </FormField>
-        <FormField
-          label="Description Size"
-          description="The size of the description."
-        >
-          <SelectSynced
-            options={textSizes as any}
-            globalConfigKey="descriptionSize"
-            disabled={disabled}
-          />
-        </FormField>
-      </div>
-
-      <Link
-        href=""
-        variant="dark"
-        display="flex"
-        marginBottom="0.5rem"
-        style={{
-          cursor: "pointer",
-          justifyContent: "start",
-          alignItems: "center",
-          gap: "0.25rem"
-        }}
-        onClick={() => setCollapseButton((value) => !value)}
-      >
-        <Icon name={collapseButton ? "expand" : "collapse"} />
-        <Heading size="small">Button Settings</Heading>
-      </Link>
-      <div style={{ overflow: "hidden" }} data-collapsed={collapseButton}>
         <FormField
           label="Button"
           description="The text displayed within the button."
@@ -530,7 +349,122 @@ export const SettingsComponent = () => {
             placeholder={defaults.buttonScale}
           />
         </FormField>
-      </div>
+      </Accordion>
+
+      <Accordion
+        title="Container Options"
+        description="Change these settings to alter the container's padding."
+      >
+        <FormField
+          label="Large Width"
+          description="The width of the container when the extension has a large viewport."
+        >
+          <InputSynced
+            globalConfigKey="containerWidthLarge"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.containerWidthLarge}
+          />
+        </FormField>
+        <FormField
+          label="Medium Width"
+          description="The width of the container when the extension has a medium viewport."
+        >
+          <InputSynced
+            globalConfigKey="containerWidthMedium"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.containerWidthMedium}
+          />
+        </FormField>
+        <FormField
+          label="Small Width"
+          description="The width of the container when the extension has a small viewport."
+        >
+          <InputSynced
+            globalConfigKey="containerWidthSmall"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.containerWidthSmall}
+          />
+        </FormField>
+        <FormField
+          label="XSmall Width"
+          description="The width of the container when the extension has an xsmall viewport."
+        >
+          <InputSynced
+            globalConfigKey="containerWidthXSmall"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.containerWidthXSmall}
+          />
+        </FormField>
+      </Accordion>
+
+      <Accordion
+        title="Title Options"
+        description="Change these settings to alter the title's text and styles."
+      >
+        <FormField
+          label="Title"
+          description="The title displayed above the button."
+        >
+          <InputSynced
+            globalConfigKey="title"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.title}
+          />
+        </FormField>
+        <FormField label="Title Centered">
+          <SwitchSynced
+            globalConfigKey="titleCenter"
+            disabled={disabled}
+            label="Whether or not the title is centered."
+          />
+        </FormField>
+        <FormField label="Title Size" description="The size of the title.">
+          <SelectSynced
+            options={headingSizes as any}
+            globalConfigKey="titleSize"
+            disabled={disabled}
+          />
+        </FormField>
+      </Accordion>
+
+      <Accordion
+        title="Description Options"
+        description="Change these settings to alter the description's text and styles."
+      >
+        <FormField
+          label="Description"
+          description="The description displayed above the button."
+        >
+          <InputSynced
+            globalConfigKey="description"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.description}
+          />
+        </FormField>
+        <FormField label="Description Centered">
+          <SwitchSynced
+            globalConfigKey="descriptionCenter"
+            disabled={disabled}
+            label="Whether or not the description is centered."
+          />
+        </FormField>
+        <FormField
+          label="Description Size"
+          description="The size of the description."
+        >
+          <SelectSynced
+            options={textSizes as any}
+            globalConfigKey="descriptionSize"
+            disabled={disabled}
+          />
+        </FormField>
+      </Accordion>
     </Box>
   )
 }
