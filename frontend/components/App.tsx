@@ -146,7 +146,7 @@ export const AppComponent = () => {
           width="100%"
           display="block"
           textAlign={buttonCenter ? "center" : "left"}
-          marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+          marginY={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
         >
           <Button
             icon={buttonIcon}
@@ -180,7 +180,7 @@ export const AppComponent = () => {
                 size="small"
                 textColor={color(colors.GRAY_BRIGHT)}
                 textAlign="center"
-                marginY={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+                marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
               >
                 {message.split("\n").map((line, index, { length }) => (
                   <>
