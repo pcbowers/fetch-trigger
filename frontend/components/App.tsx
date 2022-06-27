@@ -1,102 +1,20 @@
-import React, { useState } from "react"
 import {
   Box,
   Button,
   colors,
+  colorUtils,
   Heading,
   Text,
+  useBase,
   useGlobalConfig,
-  colorUtils,
-  useSession,
-  useBase
+  useSession
 } from "@airtable/blocks/ui"
-import type GlobalConfig from "@airtable/blocks/dist/types/src/global_config"
-import type Session from "@airtable/blocks/dist/types/src/models/session"
-import type { CollaboratorData } from "@airtable/blocks/dist/types/src/types/collaborator"
-import type Base from "@airtable/blocks/dist/types/src/models/base"
+import React, { memo, useState } from "react"
 
-import { defaults, hasConfigPermissions, Permission, Settings } from "@utils"
+import { canTrigger, extractPathname, fetchWebhook, getSettings } from "@utils"
 
 const color = colorUtils.getHexForColor
 const isLightColor = colorUtils.shouldUseLightTextOnColor
-
-const submitHook = async (
-  proxy: string,
-  params: string,
-  body: string,
-  method: string,
-  headers: string
-) => {
-  let results
-
-  try {
-    const fetchResults = await fetch(proxy + params, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(headers ? JSON.parse(headers) : {})
-      },
-      ...(body ? { body } : {})
-    })
-    if (!fetchResults.ok) throw fetchResults
-
-    results = await fetchResults.json()
-  } catch (error) {
-    results = { error: error }
-  }
-
-  return results
-}
-
-export const getSettings = (config: GlobalConfig, base: Base): Settings => {
-  let settings: Record<string, any> = {}
-
-  let key: keyof Settings
-  for (key in defaults) {
-    const newValue = config.get(key)
-    if (newValue !== undefined) {
-      settings[key] = newValue
-    } else {
-      settings[key] = defaults[key]
-      if (hasConfigPermissions(config, base))
-        config.setAsync(key, settings[key])
-    }
-  }
-
-  return settings as Settings
-}
-
-const hasPermissions = (
-  permission: Permission,
-  session: Session,
-  base: Base,
-  activeCollaborators: CollaboratorData[],
-  selectedCollaborators: CollaboratorData[]
-) => {
-  switch (permission) {
-    case "Creator":
-      return base.hasPermissionToCreateTable()
-    case "Editor":
-      return session.hasPermissionToUpdateRecords()
-    case "Commenter": //currently no way to differentiate between commenter and read-only
-    case "Read-only":
-      return true
-    case "Specific":
-    default:
-      return (
-        selectedCollaborators.some((c) => c.id === session.currentUser?.id) &&
-        activeCollaborators.some((c) => c.id === session.currentUser?.id)
-      )
-  }
-}
-
-const removeOrigin = (url: string, remove: boolean) => {
-  try {
-    return remove ? new URL(url).pathname : url
-  } catch (error) {
-    return url
-  }
-}
 
 let timeout: NodeJS.Timeout
 
@@ -130,12 +48,12 @@ export const AppComponent = () => {
     webhookPath,
     webhookMethod,
     webhookHeaders,
-    permissionRun,
+    permissionTrigger,
     selectedUsers
-  } = getSettings(config, base)
+  } = getSettings(config, base, true)
 
-  const enabled = hasPermissions(
-    permissionRun,
+  const enabled = canTrigger(
+    permissionTrigger,
     session,
     base,
     collaborators,
@@ -146,29 +64,34 @@ export const AppComponent = () => {
 
   const handleClick = () => {
     if (enabled) {
-      submitHook(
-        webhookProxy,
-        removeOrigin(webhookLink, webhookPath),
-        webhookData,
-        webhookMethod,
-        webhookHeaders
-      ).then((res) => {
+      fetchWebhook({
+        proxy: webhookProxy,
+        body: webhookData,
+        headers: webhookHeaders,
+        method: webhookMethod,
+        path: extractPathname(webhookLink, webhookPath)
+      }).then((res) => {
         clearTimeout(timeout)
 
-        if (res && res.success) setMessage("Webhook Triggered Successfully!")
-        else
+        if (res && res.success) {
+          setMessage("Webhook Triggered Successfully!")
+        } else {
           setMessage(
             "Failed to Trigger Webhook. Try Again?\nPlease ensure your webhook settings are accurate and that your extension has network access."
           )
-
-        timeout = setTimeout(() => setMessage(""), 3000)
+        }
+        timeout = setTimeout(() => setMessage(""), 5000)
       })
     }
   }
 
   return (
     <Box
-      minHeight="100vh"
+      position="absolute"
+      top={0}
+      bottom={0}
+      left={0}
+      right={0}
       padding="1rem"
       display="flex"
       alignItems="center"
@@ -220,10 +143,8 @@ export const AppComponent = () => {
         )}
         <Box
           width="100%"
-          display="flex"
-          flexDirection="row"
-          flexWrap={"wrap"}
-          justifyContent={buttonCenter ? "center" : "start"}
+          display="block"
+          textAlign={buttonCenter ? "center" : "left"}
           marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
         >
           <Button
@@ -238,7 +159,12 @@ export const AppComponent = () => {
             onClick={handleClick}
             style={{
               transformOrigin: "center center",
-              transform: `scale(${buttonScale})`,
+              // Ensures proper alignment with scale
+              transform: `translateX(calc(((${buttonScale} - 1) / 2) * ${
+                !buttonCenter || (buttonBlock && Number(buttonScale) < 1)
+                  ? "100"
+                  : "0"
+              }%)) scale(${buttonScale})`,
               backgroundColor: color(buttonColor),
               color: isLightColor(buttonColor) ? "#ffffff" : "#000000"
             }}
@@ -246,21 +172,23 @@ export const AppComponent = () => {
             {button}
           </Button>
           {message && (
-            <Text
-              flexShrink={0}
-              width="100%"
-              size="small"
-              textColor={color(colors.GRAY_BRIGHT)}
-              textAlign="center"
-              marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
-            >
-              {message.split("\n").map((line, index, { length }) => (
-                <>
-                  {line}
-                  {index < length - 1 && <br />}
-                </>
-              ))}
-            </Text>
+            <Box>
+              <Text
+                flexShrink={0}
+                width="100%"
+                size="small"
+                textColor={color(colors.GRAY_BRIGHT)}
+                textAlign="center"
+                marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+              >
+                {message.split("\n").map((line, index, { length }) => (
+                  <>
+                    {line}
+                    {index < length - 1 && <br />}
+                  </>
+                ))}
+              </Text>
+            </Box>
           )}
         </Box>
       </Box>
@@ -268,4 +196,6 @@ export const AppComponent = () => {
   )
 }
 
-export default AppComponent
+export const App = memo(AppComponent)
+
+export default App

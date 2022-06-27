@@ -9,7 +9,13 @@
     "baseUrl": ".",
     "paths": {
       "@utils": [
-        "utils.ts"
+        "utils/index.ts"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@styles/*": [
+        "styles/*"
       ]
     }
   },
