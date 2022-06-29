@@ -45,7 +45,7 @@ export const defaults: Settings = {
   containerWidthXSmall: "100%",
   title: "",
   titleCenter: false,
-  titleSize: "default",
+  titleSize: "xlarge",
   description: "",
   descriptionCenter: false,
   descriptionSize: "default",

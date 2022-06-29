@@ -4,14 +4,18 @@ import {
   colors,
   colorUtils,
   Heading,
+  Link,
   Text,
   useBase,
   useGlobalConfig,
   useSession
 } from "@airtable/blocks/ui"
+import ReactMarkdown from "react-markdown"
 import React, { memo, useState } from "react"
 
 import { canTrigger, extractPathname, fetchWebhook, getSettings } from "@utils"
+
+import "@styles/app.css"
 
 const color = colorUtils.getHexForColor
 const isLightColor = colorUtils.shouldUseLightTextOnColor
@@ -118,6 +122,7 @@ export const AppComponent = () => {
             justifyContent={titleCenter ? "center" : "start"}
           >
             <Heading
+              width="100%"
               textAlign={titleCenter ? "center" : "left"}
               size={titleSize}
               marginBottom="0"
@@ -134,32 +139,28 @@ export const AppComponent = () => {
             justifyContent={descriptionCenter ? "center" : "start"}
           >
             <Text
+              width="100%"
               size={descriptionSize}
               textAlign={descriptionCenter ? "center" : "left"}
               textColor={color(colors.GRAY_BRIGHT)}
-              style={{ whiteSpace: "pre-line" }}
             >
-              {description
-                .replace(/\\n/g, "\n")
-                .split(
-                  /([_*])(?<!(?:\1|\w).)(?![_*\s])(.*?[^_*\s])(?=\1)([_*])(?!\w|\3)()/g
-                )
-                .reduce((prev, cur, index, arr) => {
-                  if (
-                    index !== 0 &&
-                    ["*", "_"].includes(arr[index - 1]) &&
-                    cur
-                  ) {
-                    prev.push(() => <strong>{cur}</strong>)
-                  } else if (cur && !["*", "_"].includes(cur)) {
-                    prev.push(() => <>{cur}</>)
+              <ReactMarkdown
+                allowedElements={["hr", "em", "strong", "code", "br", "a", "p"]}
+                skipHtml={true}
+                unwrapDisallowed={true}
+                linkTarget={"_blank"}
+                components={{
+                  a({ className, children, href, ...props }) {
+                    return (
+                      <Link className={className} href={href || ""} {...props}>
+                        {children}
+                      </Link>
+                    )
                   }
-
-                  return prev
-                }, [] as (() => JSX.Element)[])
-                .map((Item, index) => (
-                  <Item key={index} />
-                ))}
+                }}
+              >
+                {description.replace(/\\n/g, "\n")}
+              </ReactMarkdown>
             </Text>
           </Box>
         )}

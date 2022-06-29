@@ -15,7 +15,7 @@ import {
   useBase,
   useGlobalConfig
 } from "@airtable/blocks/ui"
-import React, { useState, memo } from "react"
+import React, { useState, memo, useEffect, useRef } from "react"
 
 import {
   canEdit,
@@ -42,7 +42,21 @@ import type { Settings as SettingsProps } from "@utils"
 import "@styles/settings.css"
 import Accordion from "./Accordion"
 
-export const SettingsComponent = () => {
+interface SettingsComponentProps {
+  setScroll: React.Dispatch<React.SetStateAction<number>>
+  scroll: number
+  setAccordions: React.Dispatch<
+    React.SetStateAction<{ [key: string]: boolean }>
+  >
+  accordions: { [key: string]: boolean }
+}
+
+export const SettingsComponent = ({
+  setScroll,
+  scroll,
+  setAccordions,
+  accordions
+}: SettingsComponentProps) => {
   const config = useGlobalConfig()
   const base = useBase()
   const collaborators = base.activeCollaborators
@@ -50,6 +64,7 @@ export const SettingsComponent = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [search, setSearch] = useState("")
+  const container = useRef<HTMLElement>(null)
 
   const [permissionEditor, setPermissionEditor] = useState(
     () => getSettings(config, base).permissionEditor
@@ -65,6 +80,30 @@ export const SettingsComponent = () => {
       }
     })
   }
+
+  const getAccordion = (id: string) => !!accordions[id]
+
+  const handleAccordion = (id: string, initial: boolean = false) => {
+    if (!(id in accordions)) {
+      setAccordions((accordions) => ({ ...accordions, [id]: initial }))
+    }
+
+    return () => {
+      setAccordions((accordions) => ({
+        ...accordions,
+        [id]: !accordions[id]
+      }))
+    }
+  }
+
+  useEffect(() => {
+    const curContainer = container.current
+    curContainer?.scrollTo(0, scroll)
+
+    return () => {
+      setScroll(curContainer?.scrollTop || 0)
+    }
+  }, [scroll, setScroll])
 
   const setActiveUsers = (collaborator: CollaboratorData) =>
     runIfCanEdit(config, base, () => {
@@ -99,6 +138,7 @@ export const SettingsComponent = () => {
 
   return (
     <Box
+      ref={container}
       padding="1rem"
       position="absolute"
       top={0}
@@ -155,7 +195,8 @@ export const SettingsComponent = () => {
       )}
 
       <Accordion
-        open={true}
+        value={getAccordion("webhook")}
+        onChange={handleAccordion("webhook", true)}
         title="Webhook Options"
         description="Change these settings to set the webhook request that is triggered by
         this extension when run."
@@ -227,6 +268,8 @@ export const SettingsComponent = () => {
       </Accordion>
 
       <Accordion
+        value={getAccordion("permission")}
+        onChange={handleAccordion("permission")}
         title="Permission Options"
         description="Change these settings to make changes to the setting and trigger permissions."
       >
@@ -315,6 +358,8 @@ export const SettingsComponent = () => {
       </Accordion>
 
       <Accordion
+        value={getAccordion("button")}
+        onChange={handleAccordion("button")}
         title="Button Options"
         description="Change these settings to alter the trigger button's text and styles."
       >
@@ -376,6 +421,8 @@ export const SettingsComponent = () => {
       </Accordion>
 
       <Accordion
+        value={getAccordion("container")}
+        onChange={handleAccordion("container")}
         title="Container Options"
         description="Change these settings to alter the container's padding."
       >
@@ -426,6 +473,8 @@ export const SettingsComponent = () => {
       </Accordion>
 
       <Accordion
+        value={getAccordion("title")}
+        onChange={handleAccordion("title")}
         title="Title Options"
         description="Change these settings to alter the title's text and styles."
       >
@@ -457,12 +506,27 @@ export const SettingsComponent = () => {
       </Accordion>
 
       <Accordion
+        value={getAccordion("description")}
+        onChange={handleAccordion("description")}
         title="Description Options"
         description="Change these settings to alter the description's text and styles."
       >
         <FormField
           label="Description"
-          description="The description displayed above the button."
+          description={
+            <>
+              The description displayed above the button. Supports a limited set
+              of markdown (bold, italic, code, link, hr, and \n conversion). If
+              you are unfamiliar with markdown, you may want to try this{" "}
+              <Link
+                href="https://commonmark.org/help/tutorial/index.html"
+                target="_blank"
+              >
+                Markdown Tutorial
+              </Link>
+              .
+            </>
+          }
         >
           <InputSynced
             globalConfigKey="description"

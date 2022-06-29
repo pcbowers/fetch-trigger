@@ -1,20 +1,21 @@
 import { Box, Heading, Icon, Link, Text, Tooltip } from "@airtable/blocks/ui"
-import React, { useState } from "react"
+import React from "react"
 
 interface AccordionProps {
-  open?: boolean
+  value: boolean
+  onChange: () => void
   title: string
   description: string
   children: React.ReactNode
 }
 
 const AccordionComponent: React.FC<AccordionProps> = ({
-  open = false,
+  value,
   title,
   description,
+  onChange,
   children
 }) => {
-  const [visible, setVisible] = useState(open)
   return (
     <>
       <Box
@@ -55,16 +56,16 @@ const AccordionComponent: React.FC<AccordionProps> = ({
             alignItems: "center",
             gap: "0.25rem"
           }}
-          onClick={() => setVisible((value) => !value)}
+          onClick={onChange}
         >
           <Heading size="small" marginBottom="0">
             {title}
           </Heading>
-          <Icon name={visible ? "expand" : "collapse"} />
+          <Icon name={value ? "expand" : "collapse"} />
         </Link>
       </Box>
 
-      {visible && <div>{children}</div>}
+      {value && <div>{children}</div>}
     </>
   )
 }

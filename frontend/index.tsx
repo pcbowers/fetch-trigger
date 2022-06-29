@@ -14,6 +14,10 @@ import Settings from "@components/Settings"
 
 const Root = () => {
   const [isShowingSettings, setIsShowingSettings] = useState(() => false)
+  const [settingsScrollY, setSettingsScrollY] = useState(() => 0)
+  const [accordions, setAccordions] = useState<{ [key: string]: boolean }>(
+    () => ({})
+  )
   const base = useBase()
   const config = useGlobalConfig()
 
@@ -34,7 +38,14 @@ const Root = () => {
   // TODO: AT seems to have a bug that causes scroll issues when flip-flopping between settings. Causes a component to scroll to the bottom
 
   if (isShowingSettings) {
-    return <Settings />
+    return (
+      <Settings
+        setScroll={setSettingsScrollY}
+        scroll={settingsScrollY}
+        accordions={accordions}
+        setAccordions={setAccordions}
+      />
+    )
   }
   return <App />
 }
