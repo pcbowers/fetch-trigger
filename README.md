@@ -4,7 +4,7 @@
 
 An Airtable Extension with several customization options including permission, design, and functional settings that allows one to trigger a webhook, make an API call, or send data to another application by the simple press of a button.
 
-This extension shines in its customizability. Settings are self-documented and provide a range of use cases. Want to have a manual trigger for an automation? Go ahead! Want to run a Zap for Zapier integration? This automation makes it possible. Want to export data to another application? Input your webhook options and you are ready to go.
+This extension shines in its customizability. Settings are self-documented and provide a range of use cases. Want to have a manual trigger for an automation? Go ahead! Want to run a Zap for Zapier integration? This automation makes it possible. Want to export data to another application? Input your webhook options and you are ready to go. Data can even be dynamically pulled from the base using the Cursor API and/or tables and views and sent along with the webhook making this an incredibly powerful tool.
 
 ![Example Gif](/docs/example.gif)
 
@@ -20,7 +20,6 @@ This extension shines in its customizability. Settings are self-documented and p
 
 ## Future Optimizations
 
-- Add Dynamic Webhook Data through the use of the Cursor API and/or predefined records and/or predefined tables and/or predefined filters
 - Add Ability to Work with return value and update/create a record with the value
 
 ## Development

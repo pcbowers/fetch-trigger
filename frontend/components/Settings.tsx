@@ -11,15 +11,18 @@ import {
   SelectSynced,
   Switch,
   SwitchSynced,
+  TablePickerSynced,
   Text,
   useBase,
-  useGlobalConfig
+  useGlobalConfig,
+  ViewPickerSynced
 } from "@airtable/blocks/ui"
 import React, { useState, memo, useEffect, useRef } from "react"
 
 import {
   canEdit,
   colors,
+  dataTypes,
   defaults,
   getSettings,
   headingSizes,
@@ -69,7 +72,10 @@ export const SettingsComponent = ({
   const [permissionEditor, setPermissionEditor] = useState(
     () => getSettings(config, base).permissionEditor
   )
-  const { selectedUsers } = getSettings(config, base)
+  const { selectedUsers, webhookDataType, webhookDataTable } = getSettings(
+    config,
+    base
+  )
 
   const handleClick = () => {
     setIsDialogOpen(false)
@@ -224,18 +230,81 @@ export const SettingsComponent = ({
           />
         </FormField>
         <FormField
-          label="Webhook Data"
-          description="The JSON data to pass with your webhook. Leave empty if no body should be passed."
+          label="Webhook Data Type"
+          description="The type of data that will be passed to the webhook."
         >
-          <InputSynced
-            globalConfigKey="webhookData"
-            type="text"
+          <SelectSynced
+            options={dataTypes as any}
+            globalConfigKey="webhookDataType"
             disabled={disabled}
-            placeholder={defaults.webhookData}
           />
         </FormField>
+        {webhookDataType === "manual" && (
+          <FormField
+            label="Manual Data"
+            description="The JSON data to pass with your webhook. Leave empty if no body should be passed."
+          >
+            <InputSynced
+              globalConfigKey="webhookDataManual"
+              type="text"
+              disabled={disabled}
+              placeholder={defaults.webhookDataManual}
+            />
+          </FormField>
+        )}
+        {webhookDataType === "cells" && (
+          <FormField
+            label="Display Cursor Selection"
+            description="This data type allows you to convert the current cursor selection into JSON and send it with the webhook request. Toggle this on to display a visual representation of the selection under the button."
+          >
+            <SwitchSynced
+              globalConfigKey="webhookDataCells"
+              disabled={disabled}
+              label="Wether or not the current selection should be displayed."
+            />
+          </FormField>
+        )}
+        {(webhookDataType === "table" || webhookDataType === "view") && (
+          <FormField
+            label="Table Data"
+            description={
+              webhookDataType === "table" ? (
+                <>
+                  The Table that will be converted into JSON to pass with your
+                  webhook. Select none if no body should be passed. This could
+                  be very large, so use at your own risk.
+                </>
+              ) : (
+                <>
+                  The Table that will filter the available views that can be
+                  selected. Select none if no body should be passed. This could
+                  be very large, so use at your own risk.
+                </>
+              )
+            }
+          >
+            <TablePickerSynced
+              globalConfigKey="webhookDataTable"
+              shouldAllowPickingNone={true}
+              disabled={disabled}
+            />
+          </FormField>
+        )}
+        {webhookDataType === "view" && webhookDataTable && (
+          <FormField
+            label="View Data"
+            description="The View that will be converted into JSON to pass with your webhook. Select none if no body should be passed."
+          >
+            <ViewPickerSynced
+              table={base.getTableByIdIfExists(webhookDataTable)}
+              globalConfigKey="webhookDataView"
+              shouldAllowPickingNone={true}
+              disabled={disabled}
+            />
+          </FormField>
+        )}
         <FormField
-          label="Webhook Pathname Only"
+          label="Pathname Only"
           description="Some CORS proxies are set up with an explicit upstream and thus do not accept the origin of the URL. While the webhook can be modified, this setting allows you to easily remove 'https://hooks.airtable.com' or any origin from the link so just the path is appended to the proxy."
         >
           <SwitchSynced

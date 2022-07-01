@@ -25,6 +25,9 @@ export type { Permission } from "./permissions"
 export { textSizes } from "./texts"
 export type { TextSize } from "./texts"
 
+export { dataTypes } from "./dataTypes"
+export type { DataType } from "./dataTypes"
+
 export { defaults } from "./settings"
 export type { Settings } from "./settings"
 

@@ -11,11 +11,15 @@ import {
   useSession
 } from "@airtable/blocks/ui"
 import ReactMarkdown from "react-markdown"
-import React, { memo, useState } from "react"
+import React, { memo, useEffect, useState } from "react"
 
 import { canTrigger, extractPathname, fetchWebhook, getSettings } from "@utils"
 
+import CursorData from "@components/CursorData"
+import TableData from "@components/TableData"
+
 import "@styles/app.css"
+import ViewData from "./ViewData"
 
 const color = colorUtils.getHexForColor
 const isLightColor = colorUtils.shouldUseLightTextOnColor
@@ -26,6 +30,7 @@ export const AppComponent = () => {
   const config = useGlobalConfig()
   const session = useSession()
   const base = useBase()
+  const [body, setBody] = useState<string>("{}")
 
   const collaborators = base.activeCollaborators
 
@@ -48,13 +53,21 @@ export const AppComponent = () => {
     titleSize,
     webhookProxy,
     webhookLink,
-    webhookData,
+    webhookDataType,
+    webhookDataManual,
+    webhookDataCells,
+    webhookDataTable,
+    webhookDataView,
     webhookPath,
     webhookMethod,
     webhookHeaders,
     permissionTrigger,
     selectedUsers
   } = getSettings(config, base, true)
+
+  useEffect(() => {
+    if (webhookDataType === "manual") setBody(webhookDataManual)
+  }, [webhookDataManual, webhookDataType])
 
   const enabled =
     canTrigger(
@@ -71,7 +84,7 @@ export const AppComponent = () => {
     if (enabled) {
       fetchWebhook({
         proxy: webhookProxy,
-        body: webhookData,
+        body: body,
         headers: webhookHeaders,
         method: webhookMethod,
         path: extractPathname(webhookLink, webhookPath)
@@ -194,21 +207,32 @@ export const AppComponent = () => {
           >
             {button}
           </Button>
-          {message && (
-            <Box>
-              <Text
-                flexShrink={0}
-                width="100%"
-                size="small"
-                textColor={color(colors.GRAY_BRIGHT)}
-                textAlign="center"
-                marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
-                style={{ whiteSpace: "pre-line" }}
-              >
-                {message}
-              </Text>
-            </Box>
-          )}
+
+          <Box marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}>
+            <Text
+              flexShrink={0}
+              width="100%"
+              size="small"
+              textColor={color(colors.GRAY_BRIGHT)}
+              textAlign={buttonCenter ? "center" : "left"}
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {webhookDataType === "cells" && (
+                <CursorData setData={setBody} showHelp={webhookDataCells} />
+              )}
+              {webhookDataType === "table" && (
+                <TableData setData={setBody} tableId={webhookDataTable} />
+              )}
+              {webhookDataType === "view" && (
+                <ViewData
+                  setData={setBody}
+                  tableId={webhookDataTable}
+                  viewId={webhookDataView}
+                />
+              )}
+              {message && <Box marginTop="0.2rem">{message}</Box>}
+            </Text>
+          </Box>
         </Box>
       </Box>
     </Box>

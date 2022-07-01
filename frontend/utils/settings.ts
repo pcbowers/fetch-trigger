@@ -6,6 +6,7 @@ import type { TextSize } from "./texts"
 import type { Color } from "./colors"
 import type { Icon } from "./icons"
 import type { Method } from "./methods"
+import type { DataType } from "./dataTypes"
 
 export interface Settings {
   permissionTrigger: Permission
@@ -29,7 +30,11 @@ export interface Settings {
   buttonIcon: Icon
   webhookLink: string
   webhookProxy: string
-  webhookData: string
+  webhookDataType: DataType
+  webhookDataTable: string | null
+  webhookDataView: string | null
+  webhookDataManual: string
+  webhookDataCells: boolean
   webhookPath: boolean
   webhookMethod: Method
   webhookHeaders: string
@@ -57,7 +62,11 @@ export const defaults: Settings = {
   buttonIcon: "automations",
   webhookProxy: "",
   webhookLink: "",
-  webhookData: "{}",
+  webhookDataManual: "{}",
+  webhookDataTable: null,
+  webhookDataView: null,
+  webhookDataType: "manual",
+  webhookDataCells: true,
   webhookPath: true,
   webhookMethod: "POST",
   webhookHeaders: ""
