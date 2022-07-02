@@ -31,5 +31,5 @@ export type { DataType } from "./dataTypes"
 export { defaults } from "./settings"
 export type { Settings } from "./settings"
 
-export { fetchWebhook, extractPathname, getSettings } from "./helpers"
+export { fetchWebhook, extractPathname, getSettings, recordsToJSON } from "./helpers"
 export type { FetchWebhookProps } from "./helpers"

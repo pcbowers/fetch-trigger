@@ -1,5 +1,6 @@
 import Table from "@airtable/blocks/dist/types/src/models/table"
 import { useBase, useRecords } from "@airtable/blocks/ui"
+import { recordsToJSON } from "@utils"
 import React, { useEffect } from "react"
 
 interface TableDataComponentProps {
@@ -14,23 +15,12 @@ interface SelectRecordsComponentProps {
 
 const SelectRecords = ({ setData, table }: SelectRecordsComponentProps) => {
   const records = useRecords(table)
+  const fields = table.fields
 
   useEffect(() => {
-    setData(
-      JSON.stringify({
-        Records: records.map((record) => ({
-          "Airtable record ID": record.id,
-          "Airtable record URL": record.url,
-          "Field values": Object.assign(
-            {},
-            ...table.fields.map((field) => ({
-              [field.name]: record.getCellValue(field)
-            }))
-          )
-        }))
-      })
-    )
-  }, [records, setData, table])
+    setData(recordsToJSON(records, fields))
+  }, [fields, records, setData, table])
+
   return <></>
 }
 

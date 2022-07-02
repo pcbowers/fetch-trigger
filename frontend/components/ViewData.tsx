@@ -1,5 +1,6 @@
 import View from "@airtable/blocks/dist/types/src/models/view"
 import { useBase, useRecords, useViewMetadata } from "@airtable/blocks/ui"
+import { recordsToJSON } from "@utils"
 import React, { useEffect } from "react"
 
 interface TableDataComponentProps {
@@ -19,21 +20,9 @@ const SelectRecords = ({ setData, view }: SelectRecordsComponentProps) => {
   const records = useRecords(view, { fields })
 
   useEffect(() => {
-    setData(
-      JSON.stringify({
-        Records: records.map((record) => ({
-          "Airtable record ID": record.id,
-          "Airtable record URL": record.url,
-          "Field values": Object.assign(
-            {},
-            ...fields.map((field) => ({
-              [field.name]: record.getCellValue(field)
-            }))
-          )
-        }))
-      })
-    )
+    setData(recordsToJSON(records, fields))
   }, [fields, records, setData])
+
   return <></>
 }
 

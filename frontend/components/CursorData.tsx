@@ -1,3 +1,4 @@
+import Field from "@airtable/blocks/dist/types/src/models/field"
 import Record from "@airtable/blocks/dist/types/src/models/record"
 import {
   useBase,
@@ -7,6 +8,7 @@ import {
   useWatchable,
   Box
 } from "@airtable/blocks/ui"
+import { recordsToJSON } from "@utils"
 import React, { useEffect } from "react"
 
 interface CursorDataComponentProps {
@@ -29,29 +31,19 @@ const SelectRecordsComponent = ({
   fieldIds,
   recordIds
 }: SelectRecordsComponentProps) => {
-  const isSelected = (record: Record) => recordIds.includes(record.id)
-
   const base = useBase()
   const table = base.getTableById(tableId)
   const view = table.getViewById(viewId)
-  const records = useRecords(view, { fields: fieldIds }).filter(isSelected)
+  const records = useRecords(view, { fields: fieldIds }).filter(
+    (record: Record) => recordIds.includes(record.id)
+  )
+  const fields = fieldIds
+    .map((field) => table.getFieldByIdIfExists(field))
+    .filter((field) => field !== null) as Field[]
 
   useEffect(() => {
-    setData(
-      JSON.stringify({
-        Records: records.map((record) => ({
-          "Airtable record ID": record.id,
-          "Airtable record URL": record.url,
-          "Field values": Object.assign(
-            {},
-            ...fieldIds.map((field) => ({
-              [table.getFieldById(field).name]: record.getCellValue(field)
-            }))
-          )
-        }))
-      })
-    )
-  }, [fieldIds, recordIds, records, setData, table])
+    setData(recordsToJSON(records, fields))
+  }, [fieldIds, fields, recordIds, records, setData, table])
 
   return <></>
 }

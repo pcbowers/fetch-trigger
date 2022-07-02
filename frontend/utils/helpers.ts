@@ -1,5 +1,7 @@
 import GlobalConfig from "@airtable/blocks/dist/types/src/global_config"
 import Base from "@airtable/blocks/dist/types/src/models/base"
+import Field from "@airtable/blocks/dist/types/src/models/field"
+import ATRecord from "@airtable/blocks/dist/types/src/models/record"
 import { runIfCanEdit } from "./permissions"
 
 import { defaults, Settings } from "./settings"
@@ -85,3 +87,20 @@ export const extractPathname = (url: string, remove: boolean) => {
     return url
   }
 }
+
+/**
+ * Convert a list of records and fields into a JSON object
+ */
+export const recordsToJSON = (records: ATRecord[], fields: Field[]) =>
+  JSON.stringify({
+    Records: records.map((record) => ({
+      "Airtable record ID": record.id,
+      "Airtable record URL": record.url,
+      "Field values": Object.assign(
+        {},
+        ...fields.map((field) => ({
+          [field.name]: record.getCellValue(field)
+        }))
+      )
+    }))
+  })
