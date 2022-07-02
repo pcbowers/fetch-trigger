@@ -38,12 +38,15 @@ const TableDataComponent = ({ tableId, setData }: TableDataComponentProps) => {
   const base = useBase()
   const table = base.getTableByIdIfExists(tableId || "")
 
-  if (!table) {
-    setData("{}")
-  }
+  useEffect(() => {
+    if (!table) {
+      setData("{}")
+    }
+  }, [table, setData])
 
   return <>{table && <SelectRecords setData={setData} table={table} />}</>
 }
 
-const TableData = TableDataComponent
+export const TableData = TableDataComponent
+
 export default TableData

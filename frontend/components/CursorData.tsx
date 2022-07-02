@@ -4,7 +4,8 @@ import {
   useCursor,
   useLoadable,
   useRecords,
-  useWatchable
+  useWatchable,
+  Box
 } from "@airtable/blocks/ui"
 import React, { useEffect } from "react"
 
@@ -71,14 +72,16 @@ const CursorDataComponent = ({
     !!cursor.selectedRecordIds.length &&
     !!cursor.selectedFieldIds.length
 
-  if (!isCursorSelection) {
-    setData("{}")
-  }
+  useEffect(() => {
+    if (!isCursorSelection) {
+      setData("{}")
+    }
+  }, [isCursorSelection, setData])
 
   return (
     <>
       {showHelp && cursor.isDataLoaded && !!cursor.selectedRecordIds.length && (
-        <span>
+        <Box>
           <strong>
             {cursor.selectedRecordIds.length} Record
             {cursor.selectedRecordIds.length !== 1 && "s"}
@@ -89,7 +92,7 @@ const CursorDataComponent = ({
             {cursor.selectedFieldIds.length !== 1 && "s"}
           </strong>{" "}
           Selected
-        </span>
+        </Box>
       )}
       {isCursorSelection && (
         <SelectRecordsComponent
@@ -104,5 +107,6 @@ const CursorDataComponent = ({
   )
 }
 
-const CursorData = CursorDataComponent
+export const CursorData = CursorDataComponent
+
 export default CursorData

@@ -87,20 +87,17 @@ export const SettingsComponent = ({
     })
   }
 
-  const getAccordion = (id: string) => !!accordions[id]
+  const getAccordion = (id: string, initial: boolean = false) =>
+    accordions[id] === undefined ? initial : !!accordions[id]
 
-  const handleAccordion = (id: string, initial: boolean = false) => {
-    if (!(id in accordions)) {
-      setAccordions((accordions) => ({ ...accordions, [id]: initial }))
-    }
-
-    return () => {
+  const handleAccordion =
+    (id: string, initial: boolean = false) =>
+    () => {
       setAccordions((accordions) => ({
         ...accordions,
-        [id]: !accordions[id]
+        [id]: accordions[id] === undefined ? !initial : !accordions[id]
       }))
     }
-  }
 
   useEffect(() => {
     const curContainer = container.current
@@ -201,7 +198,7 @@ export const SettingsComponent = ({
       )}
 
       <Accordion
-        value={getAccordion("webhook")}
+        value={getAccordion("webhook", true)}
         onChange={handleAccordion("webhook", true)}
         title="Webhook Options"
         description="Change these settings to set the webhook request that is triggered by
@@ -332,6 +329,43 @@ export const SettingsComponent = ({
             options={methods as any}
             globalConfigKey="webhookMethod"
             disabled={disabled}
+          />
+        </FormField>
+      </Accordion>
+
+      <Accordion
+        value={getAccordion("response")}
+        onChange={handleAccordion("response")}
+        title="Response Options"
+        description="Change these settings to make changes to the response after the webhook is triggered."
+      >
+        <FormField
+          label="Successful Message"
+          description={
+            <>
+              The text displayed after the webhook triggers successfully. Use
+              the string <code>[response]</code> to embed the body of the
+              webhook response within the message. If the data is JSON, it will
+              be converted into a string.
+            </>
+          }
+        >
+          <InputSynced
+            globalConfigKey="responseSuccess"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.responseSuccess}
+          />
+        </FormField>
+        <FormField
+          label="Failure Message"
+          description="The text displayed if the webhook trigger fails."
+        >
+          <InputSynced
+            globalConfigKey="responseFail"
+            type="text"
+            disabled={disabled}
+            placeholder={defaults.responseFail}
           />
         </FormField>
       </Accordion>

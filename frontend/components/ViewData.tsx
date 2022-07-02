@@ -46,12 +46,15 @@ const TableDataComponent = ({
   const table = base.getTableByIdIfExists(tableId || "")
   const view = table?.getViewByIdIfExists(viewId || "")
 
-  if (!table || !view) {
-    setData("{}")
-  }
+  useEffect(() => {
+    if (!table || !view) {
+      setData("{}")
+    }
+  }, [table, view, setData])
 
   return <>{table && view && <SelectRecords setData={setData} view={view} />}</>
 }
 
-const ViewData = TableDataComponent
+export const ViewData = TableDataComponent
+
 export default ViewData

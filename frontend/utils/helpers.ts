@@ -22,7 +22,7 @@ export const fetchWebhook = async ({
   method = "POST",
   headers = ""
 }: FetchWebhookProps): Promise<
-  { success: unknown; error: false } | { error: unknown; success: false }
+  { response: string; error: false } | { error: unknown; response: false }
 > => {
   try {
     const fetchResults = await fetch(proxy + path, {
@@ -36,14 +36,14 @@ export const fetchWebhook = async ({
 
     if (!fetchResults.ok) throw fetchResults
 
-    const json = await fetchResults.json()
+    const text = await fetchResults.text()
 
     return {
-      success: json?.success !== undefined ? json.success : json,
+      response: text,
       error: false
     }
   } catch (error) {
-    return { error: error, success: false }
+    return { error: error, response: false }
   }
 }
 

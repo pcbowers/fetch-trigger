@@ -4,22 +4,21 @@ import {
   colors,
   colorUtils,
   Heading,
-  Link,
   Text,
   useBase,
   useGlobalConfig,
   useSession
 } from "@airtable/blocks/ui"
-import ReactMarkdown from "react-markdown"
 import React, { memo, useEffect, useState } from "react"
 
 import { canTrigger, extractPathname, fetchWebhook, getSettings } from "@utils"
 
 import CursorData from "@components/CursorData"
 import TableData from "@components/TableData"
+import ViewData from "@components/ViewData"
+import Markdown from "@components/Markdown"
 
 import "@styles/app.css"
-import ViewData from "./ViewData"
 
 const color = colorUtils.getHexForColor
 const isLightColor = colorUtils.shouldUseLightTextOnColor
@@ -62,7 +61,9 @@ export const AppComponent = () => {
     webhookMethod,
     webhookHeaders,
     permissionTrigger,
-    selectedUsers
+    selectedUsers,
+    responseFail,
+    responseSuccess
   } = getSettings(config, base, true)
 
   useEffect(() => {
@@ -90,13 +91,12 @@ export const AppComponent = () => {
         path: extractPathname(webhookLink, webhookPath)
       }).then((res) => {
         clearTimeout(timeout)
+        console.log(res)
 
-        if (res && res.success) {
-          setMessage("Webhook Triggered Successfully!")
+        if (res && res.response) {
+          setMessage(responseSuccess.replace(/\[response\]/g, res.response))
         } else {
-          setMessage(
-            "Failed to Trigger Webhook. Try Again?\nPlease ensure your webhook settings are accurate and that your extension has network access."
-          )
+          setMessage(responseFail)
         }
         timeout = setTimeout(() => setMessage(""), 5000)
       })
@@ -140,7 +140,7 @@ export const AppComponent = () => {
               size={titleSize}
               marginBottom="0"
             >
-              {title}
+              <Markdown data={title} />
             </Heading>
           </Box>
         )}
@@ -157,23 +157,7 @@ export const AppComponent = () => {
               textAlign={descriptionCenter ? "center" : "left"}
               textColor={color(colors.GRAY_BRIGHT)}
             >
-              <ReactMarkdown
-                allowedElements={["hr", "em", "strong", "code", "br", "a", "p"]}
-                skipHtml={true}
-                unwrapDisallowed={true}
-                linkTarget={"_blank"}
-                components={{
-                  a({ className, children, href, ...props }) {
-                    return (
-                      <Link className={className} href={href || ""} {...props}>
-                        {children}
-                      </Link>
-                    )
-                  }
-                }}
-              >
-                {description.replace(/\\n/g, "\n")}
-              </ReactMarkdown>
+              <Markdown data={description} />
             </Text>
           </Box>
         )}
@@ -205,33 +189,43 @@ export const AppComponent = () => {
               color: isLightColor(buttonColor) ? "#ffffff" : "#000000"
             }}
           >
-            {button}
+            <Markdown data={button} />
           </Button>
 
-          <Box marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}>
-            <Text
-              flexShrink={0}
-              width="100%"
-              size="small"
-              textColor={color(colors.GRAY_BRIGHT)}
-              textAlign={buttonCenter ? "center" : "left"}
-              style={{ whiteSpace: "pre-line" }}
-            >
-              {webhookDataType === "cells" && (
+          <Box
+            flexShrink={0}
+            marginTop={`calc(18px * ${buttonScale} - 18px + 0.2rem)`}
+            width="100%"
+            textColor={color(colors.GRAY_BRIGHT)}
+            textAlign={buttonCenter ? "center" : "left"}
+            fontSize="11px"
+          >
+            {webhookDataType === "cells" && (
+              <Box>
                 <CursorData setData={setBody} showHelp={webhookDataCells} />
-              )}
-              {webhookDataType === "table" && (
-                <TableData setData={setBody} tableId={webhookDataTable} />
-              )}
-              {webhookDataType === "view" && (
-                <ViewData
-                  setData={setBody}
-                  tableId={webhookDataTable}
-                  viewId={webhookDataView}
-                />
-              )}
-              {message && <Box marginTop="0.2rem">{message}</Box>}
-            </Text>
+              </Box>
+            )}
+            {webhookDataType === "table" && (
+              <TableData setData={setBody} tableId={webhookDataTable} />
+            )}
+            {webhookDataType === "view" && (
+              <ViewData
+                setData={setBody}
+                tableId={webhookDataTable}
+                viewId={webhookDataView}
+              />
+            )}
+            {message && (
+              <Box
+                marginTop={
+                  webhookDataType === "cells" && webhookDataCells
+                    ? "0.2rem"
+                    : "0"
+                }
+              >
+                <Markdown data={message} />
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
