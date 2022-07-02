@@ -62,6 +62,7 @@ export const AppComponent = () => {
     webhookHeaders,
     permissionTrigger,
     selectedUsers,
+    responseLength,
     responseFail,
     responseSuccess
   } = getSettings(config, base, true)
@@ -91,14 +92,17 @@ export const AppComponent = () => {
         path: extractPathname(webhookLink, webhookPath)
       }).then((res) => {
         clearTimeout(timeout)
-        console.log(res)
 
         if (res && res.response) {
           setMessage(responseSuccess.replace(/\[response\]/g, res.response))
         } else {
           setMessage(responseFail)
         }
-        timeout = setTimeout(() => setMessage(""), 5000)
+
+        timeout = setTimeout(
+          () => setMessage(""),
+          Number(responseLength) || 5000
+        )
       })
     }
   }

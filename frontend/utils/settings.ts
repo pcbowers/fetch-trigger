@@ -38,6 +38,7 @@ export interface Settings {
   webhookPath: boolean
   webhookMethod: Method
   webhookHeaders: string
+  responseLength: string
   responseSuccess: string
   responseFail: string
 }
@@ -72,7 +73,8 @@ export const defaults: Settings = {
   webhookPath: true,
   webhookMethod: "POST",
   webhookHeaders: "",
+  responseLength: "5000",
   responseSuccess: "Webhook Triggered Successfully!",
   responseFail:
-    "Failed to Trigger Webhook. Try Again?\nPlease ensure your webhook settings are accurate and that your extension has network access."
+    "Failed to Trigger Webhook. Try Again?\\nPlease ensure your webhook settings are accurate and that your extension has network access."
 }

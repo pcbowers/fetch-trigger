@@ -340,6 +340,19 @@ export const SettingsComponent = ({
         description="Change these settings to make changes to the response after the webhook is triggered."
       >
         <FormField
+          label="Response Length"
+          description="The number of milliseconds before the message displayed after the trigger should disappear."
+        >
+          <InputSynced
+            globalConfigKey="responseLength"
+            disabled={disabled}
+            type="number"
+            min="100"
+            step="100"
+            placeholder={defaults.responseLength}
+          />
+        </FormField>
+        <FormField
           label="Successful Message"
           description={
             <>
