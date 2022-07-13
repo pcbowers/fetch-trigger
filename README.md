@@ -1,4 +1,4 @@
-# Webhook Trigger
+# Fetch Trigger
 
 ![Banner](/docs/banner.svg)
 
@@ -8,20 +8,10 @@ This extension shines in its customizability. Settings are self-documented and p
 
 ![Example Gif](/docs/example.gif)
 
-## Screenshots
-
-![Screenshot 1](/docs/Webhook%20Trigger%20Screenshot%201.png)
-
-![Screenshot 2](/docs/Webhook%20Trigger%20Screenshot%202.png)
-
-![Screenshot 3](/docs/Webhook%20Trigger%20Screenshot%203.png)
-
-![Screenshot 4](/docs/Webhook%20Trigger%20Screenshot%204.png)
-
 ## Future Optimizations
 
 - Add Ability to Work with return value and update/create a record with the value
 
 ## Development
 
-If you want to help with the development of this extension, fork this repository, clone it, and run npm install to install all the various dependencies. Use the Airtable Client to add your remote repository and add a custom extension to begin editing this extension See the [Airtable Documentation](https://www.airtable.com/developers) for more information.
+If you want to help with the development of this extension, fork this repository, clone it, and run 'npm i' to install all the various dependencies. Use the Airtable Client to add your remote repository and add a custom extension to begin developing. See the [Airtable Documentation](https://www.airtable.com/developers) for more information.
